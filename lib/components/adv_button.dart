@@ -63,7 +63,9 @@ class AdvButton extends StatelessWidget {
         : backgroundColor ?? BasicComponents.button.backgroundColor;
     double fontSize = buttonSize == ButtonSize.large ? 16.0 : 12.0;
     FontWeight fontWeight = buttonSize == ButtonSize.large
-        ? bold ? FontWeight.w700 : FontWeight.w600
+        ? bold
+            ? FontWeight.w700
+            : FontWeight.w600
         : FontWeight.normal;
     Color disableTextColor =
         Color.lerp(!reverse ? Colors.white : Colors.black54, lerpColor, 0.6);
@@ -156,14 +158,30 @@ class AdvButton extends StatelessWidget {
         height: 0.0,
         child: Container(
             width: width,
-            child: FlatButton(
-              padding: finalPadding,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              color: _color,
-              disabledColor: _disableColor,
-              disabledTextColor: _disableTextColor,
-              highlightColor: Theme.of(context).dividerColor,
-              splashColor: Theme.of(context).dividerColor,
+            child: TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(finalPadding),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                overlayColor:
+                    MaterialStateProperty.resolveWith<Color>((states) {
+                  if (states.contains(MaterialState.pressed))
+                    return Theme.of(context).dividerColor;
+                  return null;
+                }),
+                foregroundColor:
+                    MaterialStateProperty.resolveWith<Color>((states) {
+                  if (states.contains(MaterialState.disabled))
+                    return _disableTextColor;
+                  return null;
+                }),
+                backgroundColor:
+                    MaterialStateProperty.resolveWith<Color>((states) {
+                  if (states.contains(MaterialState.disabled))
+                    return _disableColor;
+                  return _color;
+                }),
+                shape: MaterialStateProperty.all(border)
+              ),
               child: this.child,
               onPressed: enable
                   ? () {
@@ -171,7 +189,6 @@ class AdvButton extends StatelessWidget {
                       if (this.onPressed != null) this.onPressed();
                     }
                   : null,
-              shape: border,
             )));
   }
 }
